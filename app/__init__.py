@@ -12,7 +12,7 @@ def create_app():
     # 設定
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-12345')
     db_url = os.environ.get('DATABASE_URL', 'sqlite://')
-    if db_url and db_url.startswith("postgres://"):
+    if db_url and db_url.startswith("postgres://") and not db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
