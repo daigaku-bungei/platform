@@ -1,12 +1,10 @@
 import os
 from datetime import timedelta
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    # 🌟 ここが超重要：Renderでも怒られない「/tmp」フォルダを指定！
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:////tmp/bungei.db'
+    # 🌟 ファイルを一切作らず、メモリ上だけで動かす「最強の回避策」
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite://'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     SESSION_COOKIE_HTTPONLY = True
