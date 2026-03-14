@@ -11,7 +11,7 @@ def create_app():
 
     # 設定
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-12345')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/bungeidaigaku/bungei-platform-complete/bungei.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
