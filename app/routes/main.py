@@ -4,6 +4,11 @@ from app import db
 from app.models.novel import Novel
 from app.models.user import User
 from app.models.like import Like
+import csv
+import io
+from datetime import datetime
+from flask import Response
+from flask_login import login_required, current_user
 
 main_bp = Blueprint('main', __name__)
 
@@ -39,3 +44,42 @@ def index():
     # ▲▲▲ ここまで ▲▲▲
 
     return render_template('index.html', latest_novels=latest_novels, popular_novels=popular_novels)
+
+@main_bp.route('/admin/backup')
+@login_required
+def download_backup():
+    # 1. 管理者チェック（is_adminがTrueのユーザーだけが実行可能）
+    if not getattr(current_user, 'is_admin', False):
+        return "権限がありません。管理者アカウントでログインしてください。", 403
+
+    # 2. メモリ上にCSVファイルを作成する準備
+    si = io.StringIO()
+    cw = csv.writer(si)
+
+    # 3. ユーザーデータを書き込む
+    cw.writerow(['--- ユーザーデータ ---'])
+    cw.writerow(['ID', 'ユーザー名', 'メールアドレス', '登録日時'])
+    for u in User.query.all():
+        cw.writerow([u.id, u.username, u.email, u.created_at])
+
+    cw.writerow([]) # 区切りの空行
+
+    # 4. 小説データを書き込む
+    cw.writerow(['--- 小説データ ---'])
+    cw.writerow(['ID', 'タイトル', '投稿日時']) # 本文を入れると重くなるので、まずは基本情報のみ
+    for n in Novel.query.all():
+        cw.writerow([n.id, n.title, n.created_at])
+
+    # 5. CSVファイルとして出力
+    output = si.getvalue()
+    si.close()
+
+    # ファイル名に現在の日付と時間を入れる（例: bungei_backup_20260406_1930.csv）
+    filename = f"bungei_backup_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+    
+    # 日本語がExcelで文字化けしないように utf-8-sig でエンコードして返す
+    return Response(
+        output.encode('utf-8-sig'),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename={filename}"}
+    )
