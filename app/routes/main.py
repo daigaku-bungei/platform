@@ -29,7 +29,7 @@ def index():
     # 通常表示（最新の作品）
     latest_novels = Novel.query.filter(
         Novel.novel_type.in_(['short', 'series'])
-    ).order_by(Novel.created_at.desc()).limit(6).all()
+    ).order_by(Novel.created_at.desc()).limit(5).all()
 
     # ▼▼▼ 人気作品の算出ロジックを大改造！ ▼▼▼
     # （いいね数 × 10） ＋ PV数 の「総合スコア」が高い順に並べ替えます！
