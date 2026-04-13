@@ -22,3 +22,12 @@ class Comment(db.Model):
     # ★修正：ここを 'user' から 'author' に変更しました！
     # これで画面側の comment.author.username が動くようになります
     author = db.relationship('User', backref=db.backref('comments', lazy=True))
+    def get_like_count(self):
+        """いいねの総数を返す"""
+        return self.likes.count()
+
+    def is_liked_by(self, user):
+        """特定のユーザーが既にいいねしているか判定する"""
+        if not user or not user.is_authenticated:
+            return False
+        return self.likes.filter_by(user_id=user.id).first() is not None
